@@ -1,0 +1,40 @@
+0011000000000000        ; x3000 - program's load address
+0010 101 000010101      ; x3000 LD   R5, x3016
+0101 010 010 1 00000    ; x3001 AND  R2, R2, imm., 0d
+0010 011 000010010      ; x3002 LD   R3, x3015
+1111 0000 00100011      ; x3003 TRAP IN
+0110 001 011 000000     ; x3004 LDR  R1, R3, 0d
+0001 100 001 1 11100    ; x3005 ADD  R4, R1, imm., -4d (EOT = x04)
+0000 010 000001010      ; x3006 BR   Z, x3011
+1001 001 001 111111     ; x3007 NOT  R1, R1
+0001 001 001 1 00001    ; x3008 ADD  R1, R1, imm., 1d
+0001 001 001 0 00 000   ; x3009 ADD  R1, R1, R0
+0000 101 000000011      ; x300A BR   N-P, x300E
+
+;if PC is here, character matches
+0111 011 101 0 00000    ; x300B STR  R3, R5  (copy R3 to R5)
+0001 101 101 1 00001    ; x300C ADD  R5, R5, imm., 1d (increments R5)
+
+0001 010 010 1 00001    ; x300D ADD  R2, R2, imm., 1d
+0001 011 011 1 00001    ; x300E ADD  R3, R3, imm., 1d
+0110 001 011 000000     ; x300F LDR  R1, R3, 0d
+0000 111 111 110100     ; x3010 BR   N-Z-P, x3005
+0010 000 000000011      ; x3011 LD   R0, x3015
+0001 000 000 0 00 010   ; x3012 ADD  R0, R0, R2
+1111 0000 00100001      ; x3013 TRAP OUT
+1111 0000 00100101      ; x3014 TRAP HALT
+0011 000 100000000      ; x3015 ST   R0, x2F16 - file memory address: x3100
+0011 001 000000000      ; x3016 ST   R1, x3017 - list memory address: x3200
+0000000000110000        ; x3017 (produces output to screen)
+
+;logic:
+;build a list starting at location x3200
+;if input matches character from string
+;add to list
+
+;code structure:
+;R0 = Target character
+;R1 = Buffer  - reloaded with each char of the string
+;R2 = Counter - number of times it happens
+;R3 = Pointer - points to the next character
+;R4 = Scratch
